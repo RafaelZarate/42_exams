@@ -1,7 +1,17 @@
 
 #include <stdlib.h>
 
-struct s_queue	*init(void)
+struct s_node {
+		void *content;
+		struct s_node *next;
+	};
+
+	struct s_queue {
+		struct s_node *first;
+		struct s_node *last;
+	};
+
+struct s_queue *init(void)
 {
 	struct s_queue	*new_queue;
 
@@ -13,40 +23,51 @@ struct s_queue	*init(void)
 
 void			enqueue(struct s_queue *queue, void *content)
 {
-	struct s_node	*new_node;
+	struct s_node *node;
 
-	new_node = malloc(sizeof(struct s_node));
-	new_node->content = content;
-	new_node->next = NULL;
+	node = malloc(sizeof(struct s_node));
+	node->content = content;
+	node->next = NULL;
 	if (!queue->first)
 	{
-		queue->first = new_node;
-		queue->last = new_node;
+		queue->first = node;
+		queue->last = node;
 	}
 	else
-		queue->last = new_node;
+	{
+		queue->last->next = node;
+		queue->last = node;
+	}	
 }
 
 void			*dequeue(struct s_queue *queue)
 {
-	struct s_node	*tmp_node;
-	void			*tmp_content;
-
-	if (!queue->first)
+	if (!queue || !queue->first)
 		return (NULL);
-	tmp_node = queue->first;
-	queue->first = queue->first->next;
-	tmp_content = tmp_node->content;
-	free (tmp_node);
-	return (tmp_content);
+	else
+	{
+		struct s_node	*tmp_node;
+		void			*tmp_content;
+		tmp_node = queue->first;
+		queue->first = queue->first->next;
+		if (!queue->first)
+			queue->last = NULL;
+		tmp_content = tmp_node->content;
+		free(tmp_node);
+		return (tmp_content);
+	}
 }
 
 void			*peek(struct s_queue *queue)
 {
-	return ((queue->first) ? queue->first->content : NULL);
+	if (!queue || !queue->first)
+		return (NULL);
+	else
+		return (queue->first->content);
 }
 
 int				isEmpty(struct s_queue *queue)
 {
-	return ((queue->first) ? 0 : 1);
+	return ((!queue->first) ? 1 : 0);
 }
+
